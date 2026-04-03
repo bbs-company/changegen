@@ -2,7 +2,12 @@
   "name": "@bbs-company/changegen",
   "version": "1.0.0",
   "description": "Generate clean, categorized changelogs from git commit history",
-  "keywords": ["changelog", "git", "conventional-commits", "cli"],
+  "keywords": [
+    "changelog",
+    "git",
+    "conventional-commits",
+    "cli"
+  ],
   "license": "MIT",
   "author": "Paperclip",
   "main": "./dist/index.js",
@@ -33,8 +38,8 @@
     "dev": "ts-node src/index.ts"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
   },
   "repository": {
     "type": "git",
@@ -46,5 +51,8 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "stripe": "^22.0.0"
   }
 }
