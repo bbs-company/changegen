@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>changegen — changelog generation for everyone</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      line-height: 1.6;
+    }
+
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: #58a6ff; }
+    .hero p {
+      font-size: 1.2rem;
+      color: #8b949e;
+      max-width: 560px;
+      margin: 0 auto 32px;
+    }
+    .badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+    .badges img { height: 20px; }
+
+    .cta-group { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 10px 24px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; text-decoration: none; }
+    .btn-primary { background: #238636; color: #fff; }
+    .btn-secondary { background: #21262d; color: #e6edf3; border: 1px solid #30363d; }
+
+    /* ── Sections ── */
+    section { padding: 60px 0; border-top: 1px solid #21262d; }
+    section h2 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Features grid ── */
+    .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+    .feature {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .feature .icon { font-size: 1.5rem; margin-bottom: 8px; }
+    .feature h3 { font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+    .feature p { font-size: 0.9rem; color: #8b949e; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+    pre code { color: #e6edf3; }
+    .comment { color: #8b949e; }
+    .keyword { color: #ff7b72; }
+    .string { color: #a5d6ff; }
+    .flag { color: #79c0ff; }
+
+    /* ── Pricing ── */
+    .pricing { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .plan {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 28px;
+    }
+    .plan.featured { border-color: #58a6ff; }
+    .plan .price { font-size: 2rem; font-weight: 700; margin: 12px 0; }
+    .plan .price span { font-size: 1rem; font-weight: 400; color: #8b949e; }
+    .plan h3 { font-size: 1.1rem; font-weight: 700; }
+    .plan .badge {
+      display: inline-block;
+      background: #1f6feb;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .plan ul { list-style: none; margin-top: 16px; }
+    .plan ul li { padding: 6px 0; font-size: 0.9rem; color: #8b949e; }
+    .plan ul li::before { content: "✓  "; color: #3fb950; font-weight: 700; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid #21262d;
+      padding: 32px 0;
+      text-align: center;
+      color: #8b949e;
+      font-size: 0.875rem;
+    }
+    footer a { color: #8b949e; }
+    footer a:hover { color: #e6edf3; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <h1><span>changegen</span></h1>
+    <p>Beautiful, categorized changelogs from your git history — in seconds. Works with any repo.</p>
+
+    <div class="badges">
+      <img src="https://img.shields.io/npm/v/@bbs-company/changegen?style=flat-square&label=npm" alt="npm version" />
+      <img src="https://img.shields.io/npm/l/@bbs-company/changegen?style=flat-square" alt="MIT License" />
+      <img src="https://img.shields.io/node/v/@bbs-company/changegen?style=flat-square" alt="Node 18+" />
+    </div>
+
+    <div class="cta-group">
+      <a class="btn btn-primary" href="https://github.com/bbs-company/changegen">GitHub</a>
+      <a class="btn btn-secondary" href="https://www.npmjs.com/package/@bbs-company/changegen">npm</a>
+    </div>
+  </div>
+
+  <!-- ── Features ── -->
+  <section>
+    <h2>Why changegen?</h2>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">⚡</div>
+        <h3>Zero config</h3>
+        <p>Run <code>npx @bbs-company/changegen</code> in any repo. No setup required.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🏷️</div>
+        <h3>Conventional Commits</h3>
+        <p>Automatically groups features, fixes, breaking changes, and more.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🌐</div>
+        <h3>Hosted API</h3>
+        <p>Generate changelogs remotely via a simple HTTP API — no local clone needed.</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🔒</div>
+        <h3>Safe &amp; fast</h3>
+        <p>Rate-limited, auth-protected, and auto-cleans up temp files after every request.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CLI usage ── -->
+  <section>
+    <h2>CLI usage</h2>
+    <pre><code><span class="comment"># One-liner — no install needed</span>
+npx @bbs-company/changegen
+
+<span class="comment"># Since a specific tag, label the release</span>
+npx @bbs-company/changegen <span class="flag">--since</span> v1.2.0 <span class="flag">--version</span> 1.3.0
+
+<span class="comment"># Terminal output only (no file write)</span>
+npx @bbs-company/changegen <span class="flag">--output</span> terminal
+
+<span class="comment"># Pipe to a file</span>
+npx @bbs-company/changegen <span class="flag">--output</span> markdown <span class="flag">--no-file</span> &gt; CHANGELOG.md</code></pre>
+  </section>
+
+  <!-- ── Try it (API) ── -->
+  <section>
+    <h2>Try it — hosted API</h2>
+    <p style="color:#8b949e; margin-bottom:20px;">Send a single POST request and get back a formatted changelog. No git, no local clone.</p>
+    <pre><code><span class="keyword">curl</span> -X POST https://api.changegen.io/api/changelog \
+  -H <span class="string">"Authorization: Bearer YOUR_API_KEY"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d <span class="string">'{
+    "repoUrl": "https://github.com/bbs-company/changegen",
+    "since":   "v0.9.0",
+    "version": "1.0.0"
+  }'</span></code></pre>
+
+    <p style="color:#8b949e; margin-top:16px; font-size:0.9rem;">Response:</p>
+    <pre><code>{
+  <span class="string">"changelog"</span>: <span class="string">"## Changelog — 1.0.0  2024-06-15\n\n### Features\n..."</span>,
+  <span class="string">"stats"</span>: {
+    <span class="string">"total"</span>: 24,
+    <span class="string">"summary"</span>: <span class="string">"24 commits · 8 features · 5 fixes · 1 breaking"</span>
+  }
+}</code></pre>
+  </section>
+
+  <!-- ── Self-host ── -->
+  <section>
+    <h2>Self-host in 30 seconds</h2>
+    <pre><code><span class="comment"># Clone and build</span>
+git clone https://github.com/bbs-company/changegen.git
+cd changegen &amp;&amp; npm ci &amp;&amp; npm run build
+
+<span class="comment"># Run with Docker</span>
+docker build -t changegen .
+docker run -p 3000:3000 \
+  -e CHANGEGEN_API_KEY=secret \
+  changegen
+
+<span class="comment"># Or run directly with Node</span>
+CHANGEGEN_API_KEY=secret npm run start:server</code></pre>
+
+    <p style="color:#8b949e; margin-top:16px; font-size:0.9rem;">
+      <strong style="color:#e6edf3;">Environment variables:</strong><br>
+      <code>PORT</code> — port to listen on (default: <code>3000</code>)<br>
+      <code>CHANGEGEN_API_KEY</code> — Bearer token for API auth (leave unset to disable auth in dev)
+    </p>
+  </section>
+
+  <!-- ── Pricing ── -->
+  <section>
+    <h2>Pricing</h2>
+    <div class="pricing">
+      <div class="plan">
+        <h3>CLI — Free</h3>
+        <div class="price">$0 <span>/ forever</span></div>
+        <ul>
+          <li>Unlimited local changelog generation</li>
+          <li>All output formats (markdown, terminal)</li>
+          <li>Conventional Commits support</li>
+          <li>Works offline</li>
+          <li><code>npx @bbs-company/changegen</code></li>
+        </ul>
+      </div>
+      <div class="plan featured">
+        <h3>API <span class="badge">Hosted</span></h3>
+        <div class="price">$9 <span>/ month</span></div>
+        <ul>
+          <li>Hosted REST API — no local git needed</li>
+          <li>Generate changelogs from any public repo</li>
+          <li>JSON response with stats</li>
+          <li>Rate-limited &amp; authenticated</li>
+          <li>Self-hostable with Docker</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container">
+    <p>
+      <a href="https://github.com/bbs-company/changegen">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://www.npmjs.com/package/@bbs-company/changegen">npm</a> &nbsp;·&nbsp;
+      MIT License
+    </p>
+    <p style="margin-top:8px;">Built by <a href="https://github.com/bbs-company">bbs-company</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
