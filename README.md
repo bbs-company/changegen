@@ -1,11 +1,13 @@
 # changegen
 
+[![npm](https://img.shields.io/npm/v/@bbs-company/changegen)](https://www.npmjs.com/package/@bbs-company/changegen)
+
 Generate clean, categorized changelogs from git commit history using [Conventional Commits](https://www.conventionalcommits.org/).
 
 ## Quick Start
 
 ```bash
-npx changegen
+npx @bbs-company/changegen
 ```
 
 Reads your git history since the latest tag, prints a colorized summary to the terminal, and writes `CHANGELOG.md`.
@@ -13,9 +15,9 @@ Reads your git history since the latest tag, prints a colorized summary to the t
 ## Installation
 
 ```bash
-npm install -g changegen
+npm install -g @bbs-company/changegen
 # or use without installing:
-npx changegen
+npx @bbs-company/changegen
 ```
 
 ## Usage
@@ -39,28 +41,28 @@ changegen [options] [path]
 
 ```bash
 # Generate since latest tag (default behavior)
-npx changegen
+npx @bbs-company/changegen
 
 # Generate since a specific tag
-npx changegen --since v1.2.0
+npx @bbs-company/changegen --since v1.2.0
 
 # Label this as v1.3.0
-npx changegen --since v1.2.0 --version 1.3.0
+npx @bbs-company/changegen --since v1.2.0 --version 1.3.0
 
 # Terminal output only (no file write)
-npx changegen --output terminal
+npx @bbs-company/changegen --output terminal
 
 # Write markdown to stdout (pipe-friendly)
-npx changegen --output markdown --no-file > CHANGELOG.md
+npx @bbs-company/changegen --output markdown --no-file > CHANGELOG.md
 
 # Generate for a specific date range
-npx changegen --since "2024-01-01" --until "2024-06-30"
+npx @bbs-company/changegen --since "2024-01-01" --until "2024-06-30"
 
 # Run against a different repository
-npx changegen /path/to/another/repo
+npx @bbs-company/changegen /path/to/another/repo
 
 # List available tags
-npx changegen --list-tags
+npx @bbs-company/changegen --list-tags
 ```
 
 ## Commit Format
