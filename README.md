@@ -133,6 +133,36 @@ Documentation
   7 commits · 2 features · 2 fixes · 1 breaking
 ```
 
+## Self-hosting the API server
+
+`changegen` ships an HTTP server (`src/server.ts`) that exposes a REST API with Lemon Squeezy subscription gating.
+
+### Environment variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `PORT` | No | Port to listen on (default: `3000`) |
+| `CHANGEGEN_API_KEY` | No | Static bearer token for self-hosted deployments (bypasses subscription checks) |
+| `LEMONSQUEEZY_API_KEY` | Yes (for payments) | Lemon Squeezy API key from your dashboard |
+| `LEMONSQUEEZY_STORE_ID` | Yes (for payments) | Lemon Squeezy store ID |
+| `LEMONSQUEEZY_VARIANT_ID` | Yes (for payments) | Lemon Squeezy product variant ID to sell |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | Yes (for webhooks) | Signing secret from the Lemon Squeezy webhook settings |
+
+### API endpoints
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `GET` | `/health` | None | Health check |
+| `POST` | `/api/subscribe` | None | Returns a Lemon Squeezy checkout URL |
+| `POST` | `/api/webhook` | Signature | Handles Lemon Squeezy webhook events |
+| `POST` | `/api/changelog` | Bearer token | Generates a changelog for a remote repo |
+
+### Webhook events handled
+
+- `subscription_created` — issues a new API key for the subscriber
+- `subscription_cancelled` — deactivates the subscriber's API key
+- `subscription_expired` — deactivates the subscriber's API key
+
 ## Requirements
 
 - Node.js >= 18

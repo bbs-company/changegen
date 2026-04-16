@@ -4,7 +4,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { execSync } from 'child_process';
-import StripeLib = require('stripe');
+import { lemonSqueezySetup, createCheckout } from '@lemonsqueezy/lemonsqueezy.js';
 import { getCommits } from './git';
 import { parseCommit } from './categorize';
 import { formatMarkdown, formatStats } from './format';
@@ -14,25 +14,25 @@ import { formatMarkdown, formatStats } from './format';
 // ---------------------------------------------------------------------------
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
-const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
-const STRIPE_PRICE_ID = process.env.STRIPE_PRICE_ID || '';
+const LS_API_KEY = process.env.LEMONSQUEEZY_API_KEY || '';
+const LS_WEBHOOK_SECRET = process.env.LEMONSQUEEZY_WEBHOOK_SECRET || '';
+const LS_STORE_ID = process.env.LEMONSQUEEZY_STORE_ID || '';
+const LS_VARIANT_ID = process.env.LEMONSQUEEZY_VARIANT_ID || '';
 
 // ---------------------------------------------------------------------------
-// Stripe client (lazy — only constructed when a key is present)
+// Lemon Squeezy client (lazy — only configured when a key is present)
 // ---------------------------------------------------------------------------
 
-let _stripe: StripeLib.Stripe | null = null;
+let _lsConfigured = false;
 
-function getStripe(): StripeLib.Stripe {
-  if (!_stripe) {
-    if (!STRIPE_SECRET_KEY) {
-      throw new Error('STRIPE_SECRET_KEY is not configured');
+function ensureLemonSqueezy(): void {
+  if (!_lsConfigured) {
+    if (!LS_API_KEY) {
+      throw new Error('LEMONSQUEEZY_API_KEY is not configured');
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    _stripe = new (StripeLib as any)(STRIPE_SECRET_KEY, { apiVersion: '2025-03-31.basil' }) as StripeLib.Stripe;
+    lemonSqueezySetup({ apiKey: LS_API_KEY });
+    _lsConfigured = true;
   }
-  return _stripe!;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,7 +41,6 @@ function getStripe(): StripeLib.Stripe {
 // ---------------------------------------------------------------------------
 
 interface SubscriptionRecord {
-  customerId: string;
   subscriptionId: string;
   active: boolean;
 }
@@ -203,8 +202,8 @@ function sendHTML(res: http.ServerResponse, status: number, html: string): void 
 
 function checkAuth(req: http.IncomingMessage): boolean {
   const staticKey = process.env.CHANGEGEN_API_KEY || '';
-  // If no static key AND Stripe is not configured, auth is disabled (dev mode)
-  if (!staticKey && !STRIPE_SECRET_KEY) return true;
+  // If no static key AND Lemon Squeezy is not configured, auth is disabled (dev mode)
+  if (!staticKey && !LS_API_KEY) return true;
 
   const authHeader = req.headers['authorization'] || '';
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
@@ -215,7 +214,7 @@ function checkAuth(req: http.IncomingMessage): boolean {
   // Check against static admin key (self-hosted)
   if (staticKey && providedKey === staticKey) return true;
 
-  // Check against active Stripe subscription keys
+  // Check against active subscription keys
   const record = subscriptions.get(providedKey);
   return !!(record && record.active);
 }
@@ -252,15 +251,15 @@ function serveStatic(
 }
 
 // ---------------------------------------------------------------------------
-// Stripe handlers
+// Lemon Squeezy handlers
 // ---------------------------------------------------------------------------
 
 async function handleSubscribe(
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Promise<void> {
-  if (!STRIPE_PRICE_ID) {
-    sendJSON(res, 503, { error: 'Stripe is not configured' });
+  if (!LS_STORE_ID || !LS_VARIANT_ID) {
+    sendJSON(res, 503, { error: 'Lemon Squeezy is not configured' });
     return;
   }
 
@@ -269,14 +268,25 @@ async function handleSubscribe(
   const baseUrl = `${proto}://${host}`;
 
   try {
-    const stripe = getStripe();
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-      success_url: `${baseUrl}/?subscribed=1&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/#pricing`,
+    ensureLemonSqueezy();
+    const result = await createCheckout(LS_STORE_ID, LS_VARIANT_ID, {
+      productOptions: {
+        redirectUrl: `${baseUrl}/subscription-success`,
+      },
     });
-    sendJSON(res, 200, { url: session.url });
+
+    if (result.error) {
+      sendJSON(res, 500, { error: result.error.message });
+      return;
+    }
+
+    const url = result.data?.data?.attributes?.url;
+    if (!url) {
+      sendJSON(res, 500, { error: 'No checkout URL returned' });
+      return;
+    }
+
+    sendJSON(res, 200, { url });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     sendJSON(res, 500, { error: message });
@@ -287,14 +297,14 @@ async function handleWebhook(
   req: http.IncomingMessage,
   res: http.ServerResponse
 ): Promise<void> {
-  if (!STRIPE_WEBHOOK_SECRET) {
+  if (!LS_WEBHOOK_SECRET) {
     sendJSON(res, 503, { error: 'Webhook secret is not configured' });
     return;
   }
 
-  const sig = req.headers['stripe-signature'];
+  const sig = req.headers['x-signature'];
   if (!sig || Array.isArray(sig)) {
-    sendJSON(res, 400, { error: 'Missing stripe-signature header' });
+    sendJSON(res, 400, { error: 'Missing X-Signature header' });
     return;
   }
 
@@ -306,40 +316,46 @@ async function handleWebhook(
     return;
   }
 
-  interface StripeWebhookEvent {
-    type: string;
-    data: { object: { id: string; customer: string } };
-  }
+  // Verify HMAC-SHA256 signature
+  const hmac = crypto.createHmac('sha256', LS_WEBHOOK_SECRET);
+  hmac.update(rawBody);
+  const digest = hmac.digest('hex');
 
-  let event: StripeWebhookEvent;
-  try {
-    const stripe = getStripe();
-    event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET) as StripeWebhookEvent;
-  } catch {
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(digest))) {
     sendJSON(res, 400, { error: 'Webhook signature verification failed' });
     return;
   }
 
-  if (event.type === 'customer.subscription.created') {
-    const sub = event.data.object;
+  interface LsWebhookEvent {
+    meta: { event_name: string };
+    data: { id: string };
+  }
+
+  let event: LsWebhookEvent;
+  try {
+    event = JSON.parse(rawBody.toString('utf8')) as LsWebhookEvent;
+  } catch {
+    sendJSON(res, 400, { error: 'Invalid JSON payload' });
+    return;
+  }
+
+  const eventName = event.meta?.event_name;
+  const subscriptionId = event.data?.id;
+
+  if (eventName === 'subscription_created') {
     const apiKey = generateApiKey();
-    subscriptions.set(apiKey, {
-      customerId: sub.customer,
-      subscriptionId: sub.id,
-      active: true,
-    });
-    subToKey.set(sub.id, apiKey);
-    console.log(`[webhook] subscription created: ${sub.id} — API key issued`);
-  } else if (event.type === 'customer.subscription.deleted') {
-    const sub = event.data.object;
-    const apiKey = subToKey.get(sub.id);
+    subscriptions.set(apiKey, { subscriptionId, active: true });
+    subToKey.set(subscriptionId, apiKey);
+    console.log(`[webhook] subscription created: ${subscriptionId} — API key issued`);
+  } else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
+    const apiKey = subToKey.get(subscriptionId);
     if (apiKey) {
       const record = subscriptions.get(apiKey);
       if (record) {
         record.active = false;
       }
     }
-    console.log(`[webhook] subscription cancelled: ${sub.id}`);
+    console.log(`[webhook] subscription ${eventName}: ${subscriptionId}`);
   }
 
   sendJSON(res, 200, { received: true });
@@ -414,35 +430,11 @@ async function handleChangelog(
 // Subscription success page
 // ---------------------------------------------------------------------------
 
-async function handleSubscriptionSuccess(
-  req: http.IncomingMessage,
+function handleSubscriptionSuccess(
+  _req: http.IncomingMessage,
   res: http.ServerResponse
-): Promise<void> {
-  const urlObj = new URL(req.url || '/', `http://${req.headers.host}`);
-  const sessionId = urlObj.searchParams.get('session_id');
-
-  if (!sessionId || !STRIPE_SECRET_KEY) {
-    sendHTML(res, 400, '<h1>Invalid request</h1>');
-    return;
-  }
-
-  try {
-    const stripe = getStripe();
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['subscription'],
-    }) as { subscription?: string | { id: string } | null };
-
-    const subscriptionId =
-      typeof session.subscription === 'string'
-        ? session.subscription
-        : (session.subscription as { id: string } | null | undefined)?.id;
-
-    let apiKey: string | undefined;
-    if (subscriptionId) {
-      apiKey = subToKey.get(subscriptionId);
-    }
-
-    const html = `<!DOCTYPE html>
+): void {
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -455,9 +447,6 @@ async function handleSubscriptionSuccess(
             max-width: 480px; text-align: center; }
     h1 { color: #3fb950; margin-bottom: 12px; }
     p { color: #8b949e; margin-bottom: 16px; }
-    code { background: #21262d; border: 1px solid #30363d; border-radius: 4px;
-           padding: 12px 20px; display: block; font-size: 0.9rem; word-break: break-all;
-           color: #a5d6ff; margin: 16px 0; }
     a { color: #58a6ff; }
   </style>
 </head>
@@ -465,20 +454,13 @@ async function handleSubscriptionSuccess(
   <div class="card">
     <h1>✓ Subscription confirmed</h1>
     <p>Thank you for subscribing to changegen API.</p>
-    ${apiKey
-      ? `<p>Your API key:</p><code>${apiKey}</code><p style="font-size:0.85rem">Save this key — it will not be shown again.</p>`
-      : `<p>Your API key will be delivered once your subscription is fully activated. Please check back in a moment or contact support.</p>`
-    }
+    <p>Your API key will be delivered to your email once your subscription is fully activated. Please allow a moment for processing.</p>
     <p><a href="/">← Back to home</a></p>
   </div>
 </body>
 </html>`;
 
-    sendHTML(res, 200, html);
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    sendHTML(res, 500, `<h1>Error: ${message}</h1>`);
-  }
+  sendHTML(res, 200, html);
 }
 
 // ---------------------------------------------------------------------------
@@ -505,7 +487,7 @@ async function onRequest(
     if (serveStatic(req, res)) return;
   }
 
-  // Webhook — rate limited, but no auth (Stripe authenticates via signature)
+  // Webhook — rate limited, but no auth (Lemon Squeezy authenticates via signature)
   if (method === 'POST' && pathname === '/api/webhook') {
     if (!allowRequest(ip)) {
       sendJSON(res, 429, { error: 'Too Many Requests' });
@@ -529,7 +511,7 @@ async function onRequest(
 
   // Subscription success page — rate limited, no auth
   if (method === 'GET' && pathname === '/subscription-success') {
-    await handleSubscriptionSuccess(req, res);
+    handleSubscriptionSuccess(req, res);
     return;
   }
 
@@ -566,11 +548,11 @@ if (require.main === module) {
   const server = createServer();
   server.listen(PORT, () => {
     console.log(`changegen server listening on port ${PORT}`);
-    if (!process.env.CHANGEGEN_API_KEY && !STRIPE_SECRET_KEY) {
-      console.warn('Warning: neither CHANGEGEN_API_KEY nor STRIPE_SECRET_KEY is set — authentication is disabled');
+    if (!process.env.CHANGEGEN_API_KEY && !LS_API_KEY) {
+      console.warn('Warning: neither CHANGEGEN_API_KEY nor LEMONSQUEEZY_API_KEY is set — authentication is disabled');
     }
-    if (!STRIPE_SECRET_KEY) {
-      console.warn('Warning: STRIPE_SECRET_KEY is not set — /api/subscribe and /api/webhook are disabled');
+    if (!LS_API_KEY) {
+      console.warn('Warning: LEMONSQUEEZY_API_KEY is not set — /api/subscribe and /api/webhook are disabled');
     }
   });
 }

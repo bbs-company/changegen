@@ -53,6 +53,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "stripe": "^22.0.0"
+    "@lemonsqueezy/lemonsqueezy.js": "^4.0.0"
   }
 }
