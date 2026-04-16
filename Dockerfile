@@ -1,28 +1,40 @@
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
 # Install git (required for cloning repos)
 RUN apk add --no-cache git
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install all dependencies (including devDependencies for build)
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm ci
 
-# Copy pre-built dist (build before docker build, or add a build step)
-COPY dist/ ./dist/
+# Copy source and build
+COPY tsconfig*.json ./
+COPY src/ ./src/
+RUN npm run build
 
-# Copy static assets
+# --- Production image ---
+FROM node:20-alpine
+
+RUN apk add --no-cache git
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts
+
+COPY --from=builder /app/dist ./dist
 COPY public/ ./public/
 
-# Expose default port
 EXPOSE 3000
 
-# Environment variables (set these at runtime)
-# PORT                  - Port to listen on (default: 3000)
-# CHANGEGEN_API_KEY     - Static admin Bearer token (if unset and no Stripe key, auth is disabled)
-# STRIPE_SECRET_KEY     - Stripe secret key (enables /api/subscribe and /api/webhook)
-# STRIPE_WEBHOOK_SECRET - Stripe webhook signing secret
-# STRIPE_PRICE_ID       - Stripe Price ID for the $9/month subscription
+# Environment variables (set at runtime):
+# PORT                       - Port to listen on (default: 3000)
+# CHANGEGEN_API_KEY          - Static admin Bearer token
+# LEMONSQUEEZY_API_KEY       - Lemon Squeezy API key
+# LEMONSQUEEZY_SIGNING_SECRET - Lemon Squeezy webhook signing secret
+# LEMONSQUEEZY_VARIANT_ID    - Lemon Squeezy variant ID for $9/month plan
+# LEMONSQUEEZY_STORE_ID      - Lemon Squeezy store ID
 
 CMD ["node", "dist/server.js"]
