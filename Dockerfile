@@ -7,12 +7,12 @@ WORKDIR /app
 
 # Install all dependencies (including devDependencies for build)
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Copy source and build
 COPY tsconfig*.json ./
 COPY src/ ./src/
-RUN npm run build
+RUN npm run build --if-present || ./node_modules/.bin/tsc
 
 # --- Production image ---
 FROM node:20-alpine
