@@ -1,13 +1,13 @@
 # changegen
 
-[![npm](https://img.shields.io/npm/v/@bbs-company/changegen)](https://www.npmjs.com/package/@bbs-company/changegen)
+[![npm](https://img.shields.io/npm/v/@creativengine-ai/changegen)](https://www.npmjs.com/package/@creativengine-ai/changegen)
 
 Generate clean, categorized changelogs from git commit history using [Conventional Commits](https://www.conventionalcommits.org/).
 
 ## Quick Start
 
 ```bash
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 Reads your git history since the latest tag, prints a colorized summary to the terminal, and writes `CHANGELOG.md`.
@@ -15,9 +15,9 @@ Reads your git history since the latest tag, prints a colorized summary to the t
 ## Installation
 
 ```bash
-npm install -g @bbs-company/changegen
+npm install -g @creativengine-ai/changegen
 # or use without installing:
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 ## Usage
@@ -41,28 +41,28 @@ changegen [options] [path]
 
 ```bash
 # Generate since latest tag (default behavior)
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 
 # Generate since a specific tag
-npx @bbs-company/changegen --since v1.2.0
+npx @creativengine-ai/changegen --since v1.2.0
 
 # Label this as v1.3.0
-npx @bbs-company/changegen --since v1.2.0 --version 1.3.0
+npx @creativengine-ai/changegen --since v1.2.0 --version 1.3.0
 
 # Terminal output only (no file write)
-npx @bbs-company/changegen --output terminal
+npx @creativengine-ai/changegen --output terminal
 
 # Write markdown to stdout (pipe-friendly)
-npx @bbs-company/changegen --output markdown --no-file > CHANGELOG.md
+npx @creativengine-ai/changegen --output markdown --no-file > CHANGELOG.md
 
 # Generate for a specific date range
-npx @bbs-company/changegen --since "2024-01-01" --until "2024-06-30"
+npx @creativengine-ai/changegen --since "2024-01-01" --until "2024-06-30"
 
 # Run against a different repository
-npx @bbs-company/changegen /path/to/another/repo
+npx @creativengine-ai/changegen /path/to/another/repo
 
 # List available tags
-npx @bbs-company/changegen --list-tags
+npx @creativengine-ai/changegen --list-tags
 ```
 
 ## Commit Format

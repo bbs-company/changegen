@@ -1,6 +1,6 @@
 {
-  "name": "@bbs-company/changegen",
-  "version": "1.0.0",
+  "name": "@creativengine-ai/changegen",
+  "version": "1.0.1",
   "description": "Generate clean, categorized changelogs from git commit history",
   "keywords": [
     "changelog",
@@ -43,11 +43,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bbs-company/changegen.git"
+    "url": "git+https://github.com/creativengine-ai/changegen.git"
   },
-  "homepage": "https://github.com/bbs-company/changegen#readme",
+  "homepage": "https://github.com/creativengine-ai/changegen#readme",
   "bugs": {
-    "url": "https://github.com/bbs-company/changegen/issues"
+    "url": "https://github.com/creativengine-ai/changegen/issues"
   },
   "engines": {
     "node": ">=18.0.0"

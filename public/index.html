@@ -142,14 +142,14 @@
     <p>Beautiful, categorized changelogs from your git history — in seconds. Works with any repo.</p>
 
     <div class="badges">
-      <img src="https://img.shields.io/npm/v/@bbs-company/changegen?style=flat-square&label=npm" alt="npm version" />
-      <img src="https://img.shields.io/npm/l/@bbs-company/changegen?style=flat-square" alt="MIT License" />
-      <img src="https://img.shields.io/node/v/@bbs-company/changegen?style=flat-square" alt="Node 18+" />
+      <img src="https://img.shields.io/npm/v/@creativengine-ai/changegen?style=flat-square&label=npm" alt="npm version" />
+      <img src="https://img.shields.io/npm/l/@creativengine-ai/changegen?style=flat-square" alt="MIT License" />
+      <img src="https://img.shields.io/node/v/@creativengine-ai/changegen?style=flat-square" alt="Node 18+" />
     </div>
 
     <div class="cta-group">
-      <a class="btn btn-primary" href="https://github.com/bbs-company/changegen">GitHub</a>
-      <a class="btn btn-secondary" href="https://www.npmjs.com/package/@bbs-company/changegen">npm</a>
+      <a class="btn btn-primary" href="https://github.com/creativengine-ai/changegen">GitHub</a>
+      <a class="btn btn-secondary" href="https://www.npmjs.com/package/@creativengine-ai/changegen">npm</a>
     </div>
   </div>
 
@@ -160,7 +160,7 @@
       <div class="feature">
         <div class="icon">⚡</div>
         <h3>Zero config</h3>
-        <p>Run <code>npx @bbs-company/changegen</code> in any repo. No setup required.</p>
+        <p>Run <code>npx @creativengine-ai/changegen</code> in any repo. No setup required.</p>
       </div>
       <div class="feature">
         <div class="icon">🏷️</div>
@@ -184,16 +184,16 @@
   <section>
     <h2>CLI usage</h2>
     <pre><code><span class="comment"># One-liner — no install needed</span>
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 
 <span class="comment"># Since a specific tag, label the release</span>
-npx @bbs-company/changegen <span class="flag">--since</span> v1.2.0 <span class="flag">--version</span> 1.3.0
+npx @creativengine-ai/changegen <span class="flag">--since</span> v1.2.0 <span class="flag">--version</span> 1.3.0
 
 <span class="comment"># Terminal output only (no file write)</span>
-npx @bbs-company/changegen <span class="flag">--output</span> terminal
+npx @creativengine-ai/changegen <span class="flag">--output</span> terminal
 
 <span class="comment"># Pipe to a file</span>
-npx @bbs-company/changegen <span class="flag">--output</span> markdown <span class="flag">--no-file</span> &gt; CHANGELOG.md</code></pre>
+npx @creativengine-ai/changegen <span class="flag">--output</span> markdown <span class="flag">--no-file</span> &gt; CHANGELOG.md</code></pre>
   </section>
 
   <!-- ── Try it (API) ── -->
@@ -204,7 +204,7 @@ npx @bbs-company/changegen <span class="flag">--output</span> markdown <span cla
   -H <span class="string">"Authorization: Bearer YOUR_API_KEY"</span> \
   -H <span class="string">"Content-Type: application/json"</span> \
   -d <span class="string">'{
-    "repoUrl": "https://github.com/bbs-company/changegen",
+    "repoUrl": "https://github.com/creativengine-ai/changegen",
     "since":   "v0.9.0",
     "version": "1.0.0"
   }'</span></code></pre>
@@ -223,7 +223,7 @@ npx @bbs-company/changegen <span class="flag">--output</span> markdown <span cla
   <section>
     <h2>Self-host in 30 seconds</h2>
     <pre><code><span class="comment"># Clone and build</span>
-git clone https://github.com/bbs-company/changegen.git
+git clone https://github.com/creativengine-ai/changegen.git
 cd changegen &amp;&amp; npm ci &amp;&amp; npm run build
 
 <span class="comment"># Run with Docker</span>
@@ -254,7 +254,7 @@ CHANGEGEN_API_KEY=secret npm run start:server</code></pre>
           <li>All output formats (markdown, terminal)</li>
           <li>Conventional Commits support</li>
           <li>Works offline</li>
-          <li><code>npx @bbs-company/changegen</code></li>
+          <li><code>npx @creativengine-ai/changegen</code></li>
         </ul>
       </div>
       <div class="plan featured">
@@ -279,11 +279,11 @@ CHANGEGEN_API_KEY=secret npm run start:server</code></pre>
 <footer>
   <div class="container">
     <p>
-      <a href="https://github.com/bbs-company/changegen">GitHub</a> &nbsp;·&nbsp;
-      <a href="https://www.npmjs.com/package/@bbs-company/changegen">npm</a> &nbsp;·&nbsp;
+      <a href="https://github.com/creativengine-ai/changegen">GitHub</a> &nbsp;·&nbsp;
+      <a href="https://www.npmjs.com/package/@creativengine-ai/changegen">npm</a> &nbsp;·&nbsp;
       MIT License
     </p>
-    <p style="margin-top:8px;">Built by <a href="https://github.com/bbs-company">bbs-company</a></p>
+    <p style="margin-top:8px;">Built by <a href="https://github.com/creativengine-ai">creativengine-ai</a></p>
   </div>
 </footer>
 

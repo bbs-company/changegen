@@ -15,7 +15,7 @@ I got tired of writing changelogs by hand. Every release meant digging through g
 It reads your git commit history, recognizes Conventional Commits format, and produces a categorized, readable changelog — in the terminal, as a markdown file, or both. One command.
 
 ```
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 Example output:
@@ -41,8 +41,8 @@ It handles repos that don't use conventional commits too — they just all land 
 
 You can use it as a one-off `npx` command (zero install), install it globally, or use the hosted API tier ($9/mo) if you want changelog generation as a service in your CI pipeline.
 
-GitHub: https://github.com/bbs-company/changegen
-npm: `npx @bbs-company/changegen`
+GitHub: https://github.com/creativengine-ai/changegen
+npm: `npx @creativengine-ai/changegen`
 
 Happy to answer questions or hear what features are missing for your workflow.
 
@@ -87,7 +87,7 @@ changegen reads your git history between two refs (defaults to your latest tag a
 Then it spits out a colorized terminal summary and/or writes a `CHANGELOG.md`. By default, both.
 
 ```bash
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 That's it. No config files. No setup. Just run it in your repo.
@@ -98,16 +98,16 @@ Here are the commands I actually use:
 
 ```bash
 # Standard release prep
-npx @bbs-company/changegen --since v1.2.0 --version 1.3.0
+npx @creativengine-ai/changegen --since v1.2.0 --version 1.3.0
 
 # Quick scan of what's changed since last tag
-npx @bbs-company/changegen --output terminal
+npx @creativengine-ai/changegen --output terminal
 
 # Pipe markdown into a file manually
-npx @bbs-company/changegen --output markdown --no-file > CHANGELOG.md
+npx @creativengine-ai/changegen --output markdown --no-file > CHANGELOG.md
 
 # Check what tags exist
-npx @bbs-company/changegen --list-tags
+npx @creativengine-ai/changegen --list-tags
 ```
 
 The `--since` flag accepts a tag, a commit hash, or a date (`"2024-01-01"`). The `--until` flag works the same way if you want to generate a historical changelog.
@@ -133,11 +133,11 @@ A few things surprised me during development:
 ### Try It
 
 ```bash
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
-GitHub: https://github.com/bbs-company/changegen
-npm: `@bbs-company/changegen`
+GitHub: https://github.com/creativengine-ai/changegen
+npm: `@creativengine-ai/changegen`
 
 If you have a feature request or find a bug, open an issue. I'd love to hear how you're using it.
 
@@ -152,14 +152,14 @@ If you have a feature request or find a bug, open an issue. I'd love to hear how
 Writing changelogs manually every release is one of those small annoyances that adds up. I built `changegen` — it reads your git history, parses conventional commits, and outputs a categorized changelog (terminal + markdown) in one command.
 
 ```
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 Works on any git repo. No config files. If your repo doesn't use conventional commits, everything just lands under "Other Changes" rather than breaking.
 
 Free CLI, $9/mo hosted API if you want it in CI without Node.js.
 
-GitHub: https://github.com/bbs-company/changegen
+GitHub: https://github.com/creativengine-ai/changegen
 
 Happy to hear feedback or answer questions.
 
@@ -174,7 +174,7 @@ If you're doing releases and need changelog generation in your pipeline, I built
 It parses conventional commits and produces categorized markdown changelogs. Use it locally:
 
 ```
-npx @bbs-company/changegen --since v1.2.0 --version 1.3.0
+npx @creativengine-ai/changegen --since v1.2.0 --version 1.3.0
 ```
 
 Or in CI without Node.js via the hosted API tier ($9/mo).
@@ -183,8 +183,8 @@ Supports: custom `--since`/`--until` refs, version labels, markdown-only output 
 
 Zero config. Handles non-conventional-commit repos gracefully.
 
-GitHub: https://github.com/bbs-company/changegen
-npm: `npx @bbs-company/changegen`
+GitHub: https://github.com/creativengine-ai/changegen
+npm: `npx @creativengine-ai/changegen`
 
 ---
 
@@ -201,7 +201,7 @@ I built a CLI to fix this. 🧵
 `changegen` reads your git history, parses conventional commits, and produces a categorized changelog — in your terminal AND as a markdown file.
 
 ```
-npx @bbs-company/changegen
+npx @creativengine-ai/changegen
 ```
 
 One command. No config files. No setup. Works in any git repo.
@@ -238,11 +238,11 @@ Also accepts commit hashes and dates for `--since`/`--until`.
 
 **Tweet 5:**
 Free CLI via npx (no install needed):
-`npx @bbs-company/changegen`
+`npx @creativengine-ai/changegen`
 
 $9/mo hosted API if you want it in CI without Node.js.
 
-GitHub: https://github.com/bbs-company/changegen
-npm: `@bbs-company/changegen`
+GitHub: https://github.com/creativengine-ai/changegen
+npm: `@creativengine-ai/changegen`
 
 Would love feedback — what's missing for your workflow?
